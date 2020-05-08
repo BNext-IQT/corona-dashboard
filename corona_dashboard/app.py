@@ -91,6 +91,7 @@ app.layout = html.Div(
 @app.callback(Output('line', 'figure'), [Input('map', 'clickData')])
 def display_county_graph(clickData: dict) -> px.line:
     if not clickData:
+        # Arlignton, Virigina has a FIPS code of 51013
         clicked_county = US_COUNTIES[US_COUNTIES.fips == '51013']
     else:
         clicked_county = US_COUNTIES[US_COUNTIES.fips ==
