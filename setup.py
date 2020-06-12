@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='corona-dashboard',
     version='0.0.1',
-    description='Forecasting the spread of the novel coronavirus.',
+    description='Dashboards to analyze the spread of the novel coronavirus.',
     long_description=open("README.rst").read(),
     keywords='machine_learning artificial_intelligence dashboard forecasting',
     author='JJ Ben-Joseph',
