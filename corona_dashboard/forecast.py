@@ -1,11 +1,14 @@
 import json
+import warnings
 from time import time
 from pathlib import Path
 from urllib.request import urlretrieve
 import numpy as np
 import pandas as pd
+from sktime.forecasting.theta import ThetaForecaster
 
-HOTSPOT_LABELS = {1: 'Low', 2: 'Medium',
+
+OUTBREAK_LABELS = {1: 'Low', 2: 'Medium',
                   3: 'Medium-High', 4: 'High', 5: 'Very High'}
 
 def get_data() -> (Path, Path):
@@ -37,12 +40,31 @@ def process_data() -> (pd.DataFrame, dict):
     print('Processing data...')
 
     us_counties = pd.read_csv(counties_path, dtype={"fips": str})
-
     us_counties['location'] = us_counties[['county', 'state']].apply(', '.join, axis=1)
-    us_counties['pct_change'] = us_counties.groupby('location')['cases'].pct_change(
-        periods=5).replace([np.inf, -np.inf], np.nan).dropna()
-    final_list = us_counties.sort_values('pct_change', ascending=False)[
-        'location'].unique()
+
+    growth_rates = {}
+
+    for location in us_counties['location'].unique():
+        y = us_counties[us_counties.location == location].reset_index()['cases']
+        model = ThetaForecaster()
+        fh = np.arange(1, 12)
+        with warnings.catch_warnings():
+            # When there is no cases, it will throw a warning
+            warnings.filterwarnings("ignore") 
+            try: 
+                model.fit(y) 
+            # Value error very rarely with weird/broken time series data
+            except ValueError: 
+                continue
+            forecast = model.predict(fh).to_numpy()
+            last_forecast = forecast[len(forecast) - 1]
+            todays_cases = y[len(y) - 1]
+            # Places with very small amount of cases are hard to predict
+            case_handicap = min(1.0, todays_cases / 100)
+            growth = (last_forecast / todays_cases) * case_handicap
+            growth_rates[location] = growth
+            
+    final_list = [i[0] for i in sorted(growth_rates.items(), key=lambda i: i[1], reverse=True)] 
 
     def rank_by_buckets(row) -> int:
         if row.location in final_list[:18]:
@@ -55,8 +77,8 @@ def process_data() -> (pd.DataFrame, dict):
             return 2
         return 1
 
-    us_counties['hotspot_risk'] = us_counties.apply(rank_by_buckets, axis=1)
-    us_counties['hotspot_labels'] = us_counties.apply(
-        lambda row: HOTSPOT_LABELS[row.hotspot_risk], axis=1)
+    us_counties['outbreak_risk'] = us_counties.apply(rank_by_buckets, axis=1)
+    us_counties['outbreak_labels'] = us_counties.apply(
+        lambda row: OUTBREAK_LABELS[row.outbreak_risk], axis=1)
 
     return us_counties, fips_metadata

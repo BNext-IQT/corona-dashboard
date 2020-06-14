@@ -1,3 +1,6 @@
+"""
+The WSGI (web app) entry point.
+"""
 import plotly.express as px
 import dash
 import dash_html_components as html
@@ -5,18 +8,19 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output
 from corona_dashboard.forecast import process_data
 
+
 APP = dash.Dash(__name__)
 
 US_COUNTIES, FIPS_METADATA = process_data()
 
 MAP = px.choropleth_mapbox(
-    US_COUNTIES, geojson=FIPS_METADATA, locations='fips', color='hotspot_risk',
+    US_COUNTIES, geojson=FIPS_METADATA, locations='fips', color='outbreak_risk',
     color_continuous_scale='orrd', range_color=(0, 5),
     hover_name='location',
-    hover_data=['hotspot_labels'],
+    hover_data=['outbreak_labels'],
     mapbox_style='carto-darkmatter', zoom=3.2, opacity=0.5,
     center={'lat': 39, 'lon': -96},
-    labels={'hotspot_labels': 'risk level'}
+    labels={'outbreak_labels': 'risk level'}
 )
 MAP.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False)
 
@@ -39,9 +43,9 @@ def display_county_graph(clickData: dict) -> px.line:
         clicked_county = US_COUNTIES[US_COUNTIES.fips ==
                                      clickData['points'][0]['location']]
     county_name = clicked_county['location'].iloc[-1]
-    hotspot_labels = clicked_county['hotspot_labels'].iloc[-1]
+    hotspot_labels = clicked_county['outbreak_labels'].iloc[-1]
     fig = px.line(clicked_county, x='date', y='cases',
-                  title=f"{county_name} (Hotspot Risk: {hotspot_labels})")
+                  title=f"{county_name} (Outbreak Risk: {hotspot_labels})")
     fig.update_layout(margin=dict(l=0, r=0, t=32, b=0))
     return fig
 
