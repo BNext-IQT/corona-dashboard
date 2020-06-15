@@ -60,16 +60,16 @@ def process_data() -> (pd.DataFrame, dict):
             last_forecast = forecast[len(forecast) - 1]
             todays_cases = y[len(y) - 1]
             # Places with very small amount of cases are hard to predict
-            case_handicap = min(1.0, todays_cases / 100)
+            case_handicap = min(1.0, todays_cases / 60)
             growth = (last_forecast / todays_cases) * case_handicap
             growth_rates[location] = growth
             
     final_list = [i[0] for i in sorted(growth_rates.items(), key=lambda i: i[1], reverse=True)] 
 
     def rank_by_buckets(row) -> int:
-        if row.location in final_list[:18]:
+        if row.location in final_list[:22]:
             return 5
-        if row.location in final_list[18:72]:
+        if row.location in final_list[22:72]:
             return 4
         if row.location in final_list[72:216]:
             return 3
