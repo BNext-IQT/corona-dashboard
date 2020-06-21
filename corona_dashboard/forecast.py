@@ -3,6 +3,7 @@ import warnings
 from time import time
 from pathlib import Path
 from urllib.request import urlretrieve
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from sktime.forecasting.arima import AutoARIMA
@@ -45,7 +46,7 @@ def process_data() -> (pd.DataFrame, dict):
     growth_rates = {}
     horizon =  6
 
-    for location in us_counties['location'].unique():
+    for location in tqdm(us_counties['location'].unique(), unit=' counties'):
         y = us_counties[us_counties.location == location].reset_index()['cases']
         if len(y) < horizon:
             continue
