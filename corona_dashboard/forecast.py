@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.request import urlretrieve
 import numpy as np
 import pandas as pd
-from sktime.forecasting.theta import ThetaForecaster
+from sktime.forecasting.arima import AutoARIMA
 
 
 OUTBREAK_LABELS = {1: 'Low', 2: 'Medium',
@@ -43,11 +43,14 @@ def process_data() -> (pd.DataFrame, dict):
     us_counties['location'] = us_counties[['county', 'state']].apply(', '.join, axis=1)
 
     growth_rates = {}
+    horizon =  6
 
     for location in us_counties['location'].unique():
         y = us_counties[us_counties.location == location].reset_index()['cases']
-        model = ThetaForecaster()
-        fh = np.arange(1, 12)
+        if len(y) < horizon:
+            continue
+        model = AutoARIMA()
+        fh = np.arange(1, horizon)
         with warnings.catch_warnings():
             # When there is no cases, it will throw a warning
             warnings.filterwarnings("ignore") 
