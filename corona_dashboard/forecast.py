@@ -41,7 +41,7 @@ def process_data() -> (pd.DataFrame, dict):
     print('Processing data...')
 
     us_counties = pd.read_csv(counties_path, dtype={"fips": str})
-    us_counties['location'] = us_counties[['county', 'state']].apply(', '.join, axis=1)
+    us_counties = us_counties[us_counties.county != 'Unknown']
 
     growth_rates = {}
     horizon =  6
