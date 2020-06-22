@@ -22,7 +22,8 @@ def get_data() -> (Path, Path):
     counties_url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
 
     # 86400 = how many seconds there are in a day
-    counties_is_fresh = counties_path.exists() and (time() - counties_path.stat().st_ctime) < 86400
+    counties_is_fresh = counties_path.exists() and (
+        time() - counties_path.stat().st_ctime) < 86400
 
     if not fips_path.exists():
         print('FIPS data missing, downloading...')
@@ -42,12 +43,17 @@ def process_data() -> (pd.DataFrame, dict):
 
     us_counties = pd.read_csv(counties_path, dtype={"fips": str})
     us_counties = us_counties[us_counties.county != 'Unknown']
+    us_counties['location'] = us_counties[[
+        'county', 'state']].apply(', '.join, axis=1)
 
     growth_rates = {}
-    horizon =  6
+    horizon = 6
 
-    for location in tqdm(us_counties['location'].unique(), unit=' counties'):
-        y = us_counties[us_counties.location == location].reset_index()['cases']
+    for location in tqdm(
+            us_counties['location'].unique(),
+            unit=' counties'):
+        y = us_counties[us_counties.location == location].reset_index()[
+            'cases']
         if len(y) < horizon:
             continue
         model = AutoARIMA()
