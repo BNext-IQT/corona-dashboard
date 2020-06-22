@@ -9,8 +9,9 @@ import pandas as pd
 from sktime.forecasting.arima import AutoARIMA
 
 
-OUTBREAK_LABELS = {1: 'Low', 2: 'Medium',
-                  3: 'Medium-High', 4: 'High', 5: 'Very High'}
+OUTBREAK_LABELS = {1: 'Low', 2: 'Medium-Low', 3: 'Medium',
+                   4: 'Medium-High', 5: 'High', 6: 'Very High'}
+
 
 def get_data() -> (Path, Path):
     print('Getting data...')
@@ -60,32 +61,26 @@ def process_data() -> (pd.DataFrame, dict):
         fh = np.arange(1, horizon)
         with warnings.catch_warnings():
             # When there is no cases, it will throw a warning
-            warnings.filterwarnings("ignore") 
-            try: 
-                model.fit(y) 
+            warnings.filterwarnings("ignore")
+            try:
+                model.fit(y)
             # Value error very rarely with weird/broken time series data
-            except ValueError: 
+            except ValueError:
                 continue
             forecast = model.predict(fh).to_numpy()
             last_forecast = forecast[len(forecast) - 1]
             todays_cases = y[len(y) - 1]
             # Places with very small amount of cases are hard to predict
-            case_handicap = min(1.0, todays_cases / 60)
+            case_handicap = min(1.0, 0.5 + (todays_cases / 120))
             growth = (last_forecast / todays_cases) * case_handicap
             growth_rates[location] = growth
-            
-    final_list = [i[0] for i in sorted(growth_rates.items(), key=lambda i: i[1], reverse=True)] 
 
     def rank_by_buckets(row) -> int:
-        if row.location in final_list[:22]:
-            return 5
-        if row.location in final_list[22:72]:
-            return 4
-        if row.location in final_list[72:216]:
-            return 3
-        if row.location in final_list[216:720]:
-            return 2
-        return 1
+        case_growth = growth_rates.get(row.location)
+        if not case_growth:
+            return 1
+        return max(1,
+                min(6, round((case_growth ** 2) + ((case_growth - 1) * 8))))
 
     us_counties['outbreak_risk'] = us_counties.apply(rank_by_buckets, axis=1)
     us_counties['outbreak_labels'] = us_counties.apply(
