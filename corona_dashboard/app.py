@@ -21,7 +21,8 @@ _MAP = px.choropleth_mapbox(
         center={'lat': 39, 'lon': -96},
         labels={'outbreak_labels': 'risk level'}
 )
-_MAP.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False)
+_MAP.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False,
+                   font=dict(color="white"))
 
 APP.layout = html.Div(
             children=[
