@@ -9,6 +9,8 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from sktime.forecasting.arima import AutoARIMA
+from sktime.forecasting.model_selection import temporal_train_test_split
+from sktime.performance_metrics.forecasting import smape_loss
 
 
 OUTBREAK_LABELS = {1: 'Low', 2: 'Medium-Low', 3: 'Medium',
@@ -38,7 +40,8 @@ def get_counties_data() -> pd.DataFrame:
     return us_counties
 
 
-def forecast(us_counties: pd.DataFrame):
+def forecast(us_counties: pd.DataFrame, log_metrics=False):
+    metrics = {}
     growth_rates = {}
     horizon = 6
 
@@ -55,11 +58,16 @@ def forecast(us_counties: pd.DataFrame):
             # When there is no cases, it will throw a warning
             warnings.filterwarnings("ignore")
             try:
+                if log_metrics:
+                    y, yv = temporal_train_test_split(y, test_size=horizon - 1)
                 model.fit(y)
             # Value error very rarely with weird/broken time series data
             except ValueError:
                 continue
             predictions = model.predict(fh).to_numpy()
+            if log_metrics:
+                metrics[location] = np.mean(np.abs(yv - predictions) /
+                                        (np.abs(yv) + np.abs(predictions)))
             last_forecast = predictions[len(predictions) - 1]
             todays_cases = y[len(y) - 1]
             # Places with very small amount of cases are hard to predict
@@ -85,7 +93,7 @@ def forecast(us_counties: pd.DataFrame):
     us_counties['outbreak_labels'] = us_counties.apply(
         lambda row: OUTBREAK_LABELS[row.outbreak_risk], axis=1)
 
-    return us_counties, growth_rates, final_list
+    return us_counties, final_list, metrics
 
 
 def process_data() -> (pd.DataFrame, dict, Sequence):
@@ -99,12 +107,12 @@ def process_data() -> (pd.DataFrame, dict, Sequence):
 
     if counties_is_fresh and FORECAST_PATH.exists():
         with open(FORECAST_PATH, 'rb') as fd:
-            us_counties, growth_rates, final_list = pickle.load(fd)
+            us_counties, final_list, metrics = pickle.load(fd)
     else:
         print('US Counties data missing or stale. Creating new forecasts...')
         us_counties = get_counties_data()
-        us_counties, growth_rates, final_list = forecast(us_counties)
+        us_counties, final_list, metrics = forecast(us_counties)
         with open(FORECAST_PATH, 'wb') as fd:
-            pickle.dump((us_counties, growth_rates, final_list), fd)
+            pickle.dump((us_counties, final_list, metrics), fd)
 
     return us_counties, fips_metadata, final_list[:15]
