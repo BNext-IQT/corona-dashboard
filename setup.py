@@ -23,10 +23,11 @@ setup(
         'Operating System :: OS Independent'
     ],
     packages=find_packages(),
-    install_requires=['dash', 'plotly', 'pandas', 'numpy', 'sktime', 'pmdarima'],
+    install_requires=['dash', 'plotly', 'pandas', 'numpy', 'sktime',
+                      'pmdarima', 'fire'],
     entry_points={
         'console_scripts': [
-            'corona-dashboard = corona_dashboard.app:main',
+            'corona-dashboard = corona_dashboard.__main__:main',
         ],
     },
 )

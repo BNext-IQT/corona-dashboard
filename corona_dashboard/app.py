@@ -68,7 +68,7 @@ def display_county_graph(clickData: dict) -> px.line:
     return fig
 
 
-def main():
+def main(debug=False):
     APP.title = 'Coronavirus Dashboard'
     print('Running the web server...')
-    APP.run_server()
+    APP.run_server(debug=debug)

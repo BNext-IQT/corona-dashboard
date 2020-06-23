@@ -27,7 +27,7 @@ Usage
 
 ::
 
-    corona-dashboard
+    corona-dashboard up
 
 License and Acknowledgment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
