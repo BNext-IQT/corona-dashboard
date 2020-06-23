@@ -75,15 +75,22 @@ def process_data() -> (pd.DataFrame, dict):
             growth = (last_forecast / todays_cases) * case_handicap
             growth_rates[location] = growth
 
+    final_list = [
+        i[0]
+        for i in sorted(
+            growth_rates.items(),
+            key=lambda i: i[1],
+            reverse=True)]
+
     def rank_by_buckets(row) -> int:
         case_growth = growth_rates.get(row.location)
         if not case_growth:
             return 1
         return max(1,
-                min(6, round((case_growth ** 2) + ((case_growth - 1) * 8))))
+                   min(6, round((case_growth ** 2) + ((case_growth - 1) * 8))))
 
     us_counties['outbreak_risk'] = us_counties.apply(rank_by_buckets, axis=1)
     us_counties['outbreak_labels'] = us_counties.apply(
         lambda row: OUTBREAK_LABELS[row.outbreak_risk], axis=1)
 
-    return us_counties, fips_metadata
+    return us_counties, fips_metadata, final_list[:15]
