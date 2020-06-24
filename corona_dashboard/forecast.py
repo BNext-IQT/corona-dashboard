@@ -21,6 +21,21 @@ COUNTRIES_URL = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/
 FIPS_PATH = Path('data', 'us-fips.json')
 FORECAST_PATH = Path('data', 'forecast.pickle')
 
+
+class Hyperparameters:
+    alpha = 0.05
+    method = 'lbfgs'
+    maxiter = 50
+    n_fits = 10
+    scoring = 'mse'
+
+    @staticmethod
+    def from_dict(values):
+        hp = Hyperparameters()
+        hp.__dict__.update(values)
+        return hp
+
+
 def get_fips_data() -> dict:
     if not FIPS_PATH.exists():
         print('FIPS data missing, downloading...')
@@ -39,8 +54,7 @@ def get_counties_data() -> pd.DataFrame:
     
     return us_counties
 
-
-def forecast(us_counties: pd.DataFrame, log_metrics=False):
+def forecast(us_counties: pd.DataFrame, log_metrics=False, hp=Hyperparameters()):
     metrics = {}
     growth_rates = {}
     horizon = 6
@@ -52,7 +66,7 @@ def forecast(us_counties: pd.DataFrame, log_metrics=False):
             'cases']
         if len(y) < horizon:
             continue
-        model = AutoARIMA()
+        model = AutoARIMA(**hp.__dict__)
         fh = np.arange(1, horizon)
         with warnings.catch_warnings():
             # When there is no cases, it will throw a warning
