@@ -116,8 +116,9 @@ def process_data(log_metrics=False, hp=Hyperparameters()) -> (pd.DataFrame, dict
     fips_metadata = get_fips_data()
 
     # 86400 = how many seconds there are in a day
+    # 75600 = how many seconds there are in 21 hours
     counties_is_fresh = FORECAST_PATH.exists() and (
-        time() - FORECAST_PATH.stat().st_ctime) < 86400
+        time() - FORECAST_PATH.stat().st_ctime) < 75600
 
     if counties_is_fresh and FORECAST_PATH.exists():
         with open(FORECAST_PATH, 'rb') as fd:
