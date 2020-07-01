@@ -24,7 +24,7 @@ setup(
     ],
     packages=find_packages(),
     install_requires=['dash', 'plotly', 'pandas', 'numpy', 'sktime',
-                      'pmdarima', 'fire'],
+                      'pmdarima', 'fire', 'tqdm'],
     entry_points={
         'console_scripts': [
             'corona-dashboard = corona_dashboard.__main__:main',
