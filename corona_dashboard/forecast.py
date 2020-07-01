@@ -124,9 +124,16 @@ def process_data(log_metrics=False, hp=Hyperparameters()) -> (pd.DataFrame, dict
         with open(FORECAST_PATH, 'rb') as fd:
             us_counties, final_list, metrics = pickle.load(fd)
     else:
-        print('US Counties data missing or stale. Creating new forecasts...')
+        print('US Counties data missing or stale. Downloading fresh data...')
         us_counties = get_counties_data()
-        us_counties, final_list, metrics = forecast(us_counties, log_metrics, hp)
+        if log_metrics:
+            print('Forecasting...')
+            us_counties, final_list, _ = forecast(us_counties, log_metrics, hp)
+            print('Measuring accuracy of forecast...')
+            _, _, metrics = forecast(us_counties, log_metrics, hp)
+        else:
+            print('Forecasting...')
+            us_counties, final_list, metrics = forecast(us_counties, log_metrics, hp)
         with open(FORECAST_PATH, 'wb') as fd:
             pickle.dump((us_counties, final_list, metrics), fd)
 
