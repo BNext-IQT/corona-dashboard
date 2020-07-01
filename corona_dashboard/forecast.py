@@ -75,10 +75,10 @@ def forecast(us_counties: pd.DataFrame, log_metrics, hp):
                 if log_metrics:
                     y, yv = temporal_train_test_split(y, test_size=horizon - 1)
                 model.fit(y)
+                predictions = model.predict(fh).to_numpy()
             # Value error very rarely with weird/broken time series data
-            except ValueError:
+            except (ValueError, IndexError):
                 continue
-            predictions = model.predict(fh).to_numpy()
             if log_metrics:
                 metrics[location] = np.mean(np.abs(yv - predictions) /
                                         (np.abs(yv) + np.abs(predictions)))
