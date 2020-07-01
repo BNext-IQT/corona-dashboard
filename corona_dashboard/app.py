@@ -2,15 +2,22 @@
 The WSGI (web app) entry point.
 """
 from typing import Sequence
+from datetime import datetime
 import plotly.express as px
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
-from corona_dashboard.forecast import process_data
+from corona_dashboard.forecast import process_data, FORECAST_PATH
+
 
 APP = dash.Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
-US_COUNTIES, FIPS_METADATA, WORST_COUNTIES = process_data()
+US_COUNTIES, FIPS_METADATA, WORST_COUNTIES, METRICS = process_data()
+if len(METRICS) == 0:
+    METRICS = "Not Measured"
+else:
+    METRICS = str(sum(METRICS.values()) / len(METRICS))
+FORECAST_TIMESTAMP = datetime.fromtimestamp(FORECAST_PATH.stat().st_ctime).strftime("%A, %d %b %Y %H:%M:%S %p")
 
 _MAP = px.choropleth_mapbox(
         US_COUNTIES, geojson=FIPS_METADATA, locations='fips', color='outbreak_risk',
@@ -37,8 +44,13 @@ APP.layout = html.Div(
                                 ),
                                 html.P("Our artificial intelligence model learns from growth trends to predict next week's outbreak risk on a per-county basis. These results are experimental."),
                                 html.Br(),
-                                html.H3("FUTURE OUTBREAKS")
-                            ] + [html.P(i) for i in WORST_COUNTIES],
+                                html.B("Forecast Generated:"),
+                                html.P(FORECAST_TIMESTAMP),
+                                html.B("Predictive Error (SMAPE):"),
+                                html.P(METRICS),
+                                html.Br(),
+                                html.H3("TOP OUTBREAKS")
+                            ] + [html.P(i) for i in WORST_COUNTIES]
                         ),
                         html.Div(
                             className="nine columns div-for-charts bg-grey",
