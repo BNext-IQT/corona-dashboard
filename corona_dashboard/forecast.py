@@ -54,7 +54,7 @@ def get_counties_data() -> pd.DataFrame:
     
     return us_counties
 
-def forecast(us_counties: pd.DataFrame, log_metrics=False, hp=Hyperparameters()):
+def forecast(us_counties: pd.DataFrame, log_metrics, hp):
     metrics = {}
     growth_rates = {}
     horizon = 6
@@ -110,7 +110,7 @@ def forecast(us_counties: pd.DataFrame, log_metrics=False, hp=Hyperparameters())
     return us_counties, final_list, metrics
 
 
-def process_data() -> (pd.DataFrame, dict, Sequence):
+def process_data(log_metrics=False, hp=Hyperparameters()) -> (pd.DataFrame, dict, Sequence):
     Path('data').mkdir(exist_ok=True)
 
     fips_metadata = get_fips_data()
@@ -125,7 +125,7 @@ def process_data() -> (pd.DataFrame, dict, Sequence):
     else:
         print('US Counties data missing or stale. Creating new forecasts...')
         us_counties = get_counties_data()
-        us_counties, final_list, metrics = forecast(us_counties)
+        us_counties, final_list, metrics = forecast(us_counties, log_metrics, hp)
         with open(FORECAST_PATH, 'wb') as fd:
             pickle.dump((us_counties, final_list, metrics), fd)
 
