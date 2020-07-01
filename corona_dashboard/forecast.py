@@ -110,7 +110,7 @@ def forecast(us_counties: pd.DataFrame, log_metrics, hp):
     return us_counties, final_list, metrics
 
 
-def process_data(log_metrics=False, hp=Hyperparameters()) -> (pd.DataFrame, dict, Sequence):
+def process_data(log_metrics=True, hp=Hyperparameters()) -> (pd.DataFrame, dict, Sequence):
     Path('data').mkdir(exist_ok=True)
 
     fips_metadata = get_fips_data()
