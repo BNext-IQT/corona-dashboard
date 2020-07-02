@@ -16,7 +16,7 @@ US_COUNTIES, FIPS_METADATA, WORST_COUNTIES, METRICS = process_data()
 if len(METRICS) == 0:
     METRICS = "Not Measured"
 else:
-    METRICS = str(sum(METRICS.values()) / len(METRICS))
+    METRICS = str(round(sum(METRICS.values()) / len(METRICS), 4))
 FORECAST_TIMESTAMP = datetime.fromtimestamp(FORECAST_PATH.stat().st_ctime).strftime("%A, %d %b %Y %H:%M:%S %p")
 
 _MAP = px.choropleth_mapbox(
