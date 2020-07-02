@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 LABEL maintainer="JJ Ben-Joseph (jbenjoseph@iqt.org)" \
       description="A coronavirus dashboard container designed for high performance and minimal attack surface."
 ARG DEBIAN_FRONTEND=noninteractive
-CMD corona-dashboard
+CMD corona-dashboard up
 EXPOSE 8050
 COPY setup.py README.rst /app/
 COPY corona_dashboard /app/corona_dashboard
