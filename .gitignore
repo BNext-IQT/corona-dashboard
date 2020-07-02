@@ -1,6 +1,9 @@
 # Data dir
 data/
 
+# Custom brand
+brand.png
+
 # MacOS
 .DS_Store
 

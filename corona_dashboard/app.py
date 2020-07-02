@@ -3,6 +3,7 @@ The WSGI (web app) entry point.
 """
 from typing import Sequence
 from datetime import datetime
+from pathlib import Path
 import plotly.express as px
 import dash
 import dash_html_components as html
@@ -31,6 +32,11 @@ _MAP = px.choropleth_mapbox(
 _MAP.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False,
                    font=dict(color="white"))
 
+if (Path(APP.config.assets_folder) / "brand.png").exists():
+    _LOGO = APP.get_asset_url("brand.png")
+else:
+    _LOGO = APP.get_asset_url("logo.png")
+
 APP.layout = html.Div(
             children=[
                 html.Div(
@@ -40,7 +46,7 @@ APP.layout = html.Div(
                             className="three columns div-user-controls",
                             children=[
                                 html.Img(
-                                    className="logo", src=APP.get_asset_url("logo.png")
+                                    className="logo", src=_LOGO
                                 ),
                                 html.P("Our artificial intelligence model learns from growth trends to predict next week's outbreak risk on a per-county basis. These results are experimental."),
                                 html.Br(),
