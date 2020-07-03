@@ -10,8 +10,10 @@ import dash_core_components as dcc
 from dash.dependencies import Input, Output
 from corona_dashboard.forecast import process_data, FORECAST_PATH
 
-
 APP = dash.Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
+APP.title = 'Coronavirus Dashboard'
+SERVER = APP.server
+
 US_COUNTIES, FIPS_METADATA, WORST_COUNTIES, METRICS = process_data()
 if len(METRICS) == 0:
     METRICS = "Not Measured"
@@ -87,6 +89,5 @@ def display_county_graph(clickData: dict) -> px.line:
 
 
 def main(debug=False):
-    APP.title = 'Coronavirus Dashboard'
     print('Running the web server...')
     APP.run_server(debug=debug)
