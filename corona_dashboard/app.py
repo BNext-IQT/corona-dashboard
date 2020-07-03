@@ -1,7 +1,6 @@
 """
 The WSGI (web app) entry point.
 """
-from typing import Sequence
 from datetime import datetime
 from pathlib import Path
 import plotly.express as px
