@@ -8,9 +8,8 @@ from urllib.request import urlretrieve
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-from sktime.forecasting.arima import AutoARIMA
-from sktime.forecasting.model_selection import temporal_train_test_split
-from sktime.performance_metrics.forecasting import smape_loss
+from pmdarima.arima import AutoARIMA
+from pmdarima.model_selection import train_test_split
 
 
 OUTBREAK_LABELS = {1: 'Low', 2: 'Medium-Low', 3: 'Medium',
@@ -23,10 +22,13 @@ FORECAST_PATH = Path('data', 'forecast.pickle')
 
 
 class Hyperparameters:
-    alpha = 0.05
     method = 'lbfgs'
     maxiter = 50
-    n_fits = 10
+    start_p = 2
+    max_p = 5 
+    start_q = 2 
+    max_q = 5
+    max_d = 2
     scoring = 'mse'
 
     @staticmethod
@@ -67,15 +69,14 @@ def forecast(us_counties: pd.DataFrame, log_metrics, hp):
         if len(y) < horizon:
             continue
         model = AutoARIMA(**hp.__dict__)
-        fh = np.arange(1, horizon)
         with warnings.catch_warnings():
             # When there is no cases, it will throw a warning
             warnings.filterwarnings("ignore")
             try:
                 if log_metrics:
-                    y, yv = temporal_train_test_split(y, test_size=horizon - 1)
+                    y, yv = train_test_split(y, test_size=horizon)
                 model.fit(y)
-                predictions = model.predict(fh).to_numpy()
+                predictions = model.predict(n_periods=horizon)
             # Value error very rarely with weird/broken time series data
             except (ValueError, IndexError):
                 continue

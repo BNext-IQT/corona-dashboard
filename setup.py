@@ -23,7 +23,7 @@ setup(
         'Operating System :: OS Independent'
     ],
     packages=find_packages(),
-    install_requires=['dash', 'plotly', 'pandas', 'numpy', 'sktime',
+    install_requires=['dash', 'plotly', 'pandas', 'numpy',
                       'pmdarima', 'fire', 'tqdm'],
     extras_require={
         'full': ['uwsgi']
