@@ -26,7 +26,7 @@ setup(
     install_requires=['dash', 'plotly', 'pandas', 'numpy',
                       'pmdarima', 'fire', 'tqdm'],
     extras_require={
-        'full': ['uwsgi']
+        'full': ['uwsgi', 'sigopt']
     },
     entry_points={
         'console_scripts': [

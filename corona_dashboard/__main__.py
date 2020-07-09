@@ -1,3 +1,4 @@
+import importlib
 from fire import Fire
 
 class Controller:
@@ -17,6 +18,22 @@ class Controller:
         
         process_data()
 
+    if importlib.util.find_spec('sigopt'):
+        def new_experiment(self, apikey):
+            """
+            Create a new SigOpt experiment.
+            """
+            from corona_dashboard.extras.optim import create_experiment
+
+            print(create_experiment(apikey))
+        
+        def continue_experiment(self, apikey, exp_id):
+            """
+            Continue running a SigOpt experiment.
+            """
+            from corona_dashboard.extras.optim import continue_experiment
+
+            continue_experiment(apikey, exp_id)
 
 def main():
     Fire(Controller)
