@@ -121,7 +121,7 @@ def continue_experiment(apikey, exp_id):
         try:
             suggestion = conn.experiments(exp_id).suggestions().create()
         except ApiException:
-            suggestion = conn.experiments(exp_id).suggestions().delete()
+            conn.experiments(exp_id).suggestions().delete()
             suggestion = conn.experiments(exp_id).suggestions().create()
         assignments = Hyperparameters.from_dict(suggestion.assignments)
         print(f"Hyperpameters: {assignments.__dict__}")
