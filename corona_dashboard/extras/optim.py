@@ -19,7 +19,7 @@ def create_experiment(apikey):
                 name="max_p",
                 bounds=dict(
                     min=3,
-                    max=18
+                    max=20
                 ),
                 type="int"
             ),
@@ -35,7 +35,7 @@ def create_experiment(apikey):
                 name="max_q",
                 bounds=dict(
                     min=3,
-                    max=18
+                    max=20
                 ),
                 type="int"
             ),
@@ -43,7 +43,7 @@ def create_experiment(apikey):
                 name="max_d",
                 bounds=dict(
                     min=2,
-                    max=5
+                    max=20
                 ),
                 type="int"
             ),
@@ -59,9 +59,6 @@ def create_experiment(apikey):
                 name="method",
                 categorical_values=[
                     dict(
-                        name="newton"
-                    ),
-                    dict(
                         name="nm"
                     ),
                     dict(
@@ -72,16 +69,7 @@ def create_experiment(apikey):
                     ),
                     dict(
                         name="powell"
-                    ),
-                    dict(
-                        name="cg"
-                    ),
-                    dict(
-                        name="ncg"
-                    ),
-                    dict(
-                        name="basinhopping"
-                    ),
+                    )
                 ],
                 type="categorical"
             ),
@@ -93,6 +81,24 @@ def create_experiment(apikey):
                     ),
                     dict(
                         name="mae"
+                    )
+                ],
+                type="categorical"
+            ),
+            dict(
+                name="information_criterion",
+                categorical_values=[
+                    dict(
+                        name="aic"
+                    ),
+                    dict(
+                        name="bic"
+                    ),
+                    dict(
+                        name="hqic"
+                    ),
+                    dict(
+                        name="oob"
                     )
                 ],
                 type="categorical"
