@@ -22,14 +22,15 @@ FORECAST_PATH = Path('data', 'forecast.pickle')
 
 
 class Hyperparameters:
-    method = 'lbfgs'
-    maxiter = 50
-    start_p = 2
-    max_p = 5 
-    start_q = 2 
-    max_q = 5
-    max_d = 2
-    scoring = 'mse'
+    information_criterion = 'bic'
+    method = 'nm'
+    scoring = 'mae'
+    maxiter = 170
+    start_p = 3
+    max_p = 18
+    start_q = 3
+    max_q = 14
+    max_d = 18
 
     @staticmethod
     def from_dict(values):
