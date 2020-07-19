@@ -1,5 +1,6 @@
 import importlib
 from fire import Fire
+from corona_dashboard.forecast import Hyperparameters
 
 class Controller:
     def up(self, debug=False):
@@ -10,13 +11,18 @@ class Controller:
 
         app.main(debug)
     
-    def cache(self):
+    def cache(self, hp=None):
         """
         Just cache the data. It doesn't run the web app.
         """
         from corona_dashboard.forecast import process_data
         
-        process_data()
+        if hp:
+            print(f"Hyperparameters: {hp}")
+            hp = Hyperparameters.from_dict(hp)
+            process_data(hp=hp)
+        else:
+            process_data()
 
     if importlib.util.find_spec('sigopt'):
         def new_experiment(self, apikey):
