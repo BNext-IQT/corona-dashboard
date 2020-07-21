@@ -60,7 +60,7 @@ def get_counties_data() -> pd.DataFrame:
 def forecast(us_counties: pd.DataFrame, log_metrics, hp):
     metrics = {}
     growth_rates = {}
-    horizon = 6
+    horizon = 7
 
     for location in tqdm(
             us_counties['location'].unique(),
@@ -98,16 +98,13 @@ def forecast(us_counties: pd.DataFrame, log_metrics, hp):
             key=lambda i: i[1],
             reverse=True)]
 
-    def rank_by_buckets(row) -> int:
+    def rank_risk(row) -> int:
         case_growth = growth_rates.get(row.location)
         if not case_growth:
             return 1
-        return max(1,
-                   min(6, round((case_growth ** 2) + ((case_growth - 1) * 8))))
+        return round(max(0, (case_growth - 1) * 100))
 
-    us_counties['outbreak_risk'] = us_counties.apply(rank_by_buckets, axis=1)
-    us_counties['outbreak_labels'] = us_counties.apply(
-        lambda row: OUTBREAK_LABELS[row.outbreak_risk], axis=1)
+    us_counties['outbreak_risk'] = us_counties.apply(rank_risk, axis=1)
 
     return us_counties, final_list, metrics
 

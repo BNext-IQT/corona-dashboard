@@ -23,12 +23,12 @@ FORECAST_TIMESTAMP = datetime.fromtimestamp(FORECAST_PATH.stat().st_ctime).strft
 
 _MAP = px.choropleth_mapbox(
         US_COUNTIES, geojson=FIPS_METADATA, locations='fips', color='outbreak_risk',
-        color_continuous_scale='orrd', range_color=(0, 6),
+        color_continuous_scale='orrd', range_color=(0, 60),
         hover_name='location',
-        hover_data=['outbreak_labels'],
+        hover_data=['outbreak_risk'],
         mapbox_style='carto-darkmatter', zoom=3.2, opacity=0.5,
         center={'lat': 39, 'lon': -96},
-        labels={'outbreak_labels': 'risk level'}
+        labels={'outbreak_risk': 'growth percentage'}
 )
 _MAP.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False,
                    font=dict(color="white"))
@@ -80,9 +80,11 @@ def display_county_graph(clickData: dict) -> px.line:
         clicked_county = US_COUNTIES[US_COUNTIES.fips ==
                                     clickData['points'][0]['location']]
     county_name = clicked_county['location'].iloc[-1]
-    hotspot_labels = clicked_county['outbreak_labels'].iloc[-1]
+    hotspot_risk = clicked_county['outbreak_risk'].iloc[-1]
+    if hotspot_risk == 0:
+        hotspot_risk = 'N/A [Not Enough Data]'
     fig = px.line(clicked_county, x='date', y='cases',
-                title=f"{county_name} (Outbreak Risk: {hotspot_labels})")
+                title=f"{county_name} (Predicted Growth: {hotspot_risk}%)")
     fig.update_layout(margin=dict(l=0, r=0, t=32, b=0), plot_bgcolor='#323130',
                     paper_bgcolor='#323130', font=dict(color="white"))
     return fig
