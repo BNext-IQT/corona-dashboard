@@ -84,7 +84,7 @@ def display_county_graph(clickData: dict) -> px.line:
     if hotspot_risk == 0:
         hotspot_risk = 'N/A [Not Enough Data]'
     fig = px.line(clicked_county, x='date', y='cases',
-                title=f"{county_name} (Predicted Growth: {hotspot_risk}%)")
+                title=f"{county_name} (Predicted Weekly Growth: {hotspot_risk}%)")
     fig.update_layout(margin=dict(l=0, r=0, t=32, b=0), plot_bgcolor='#323130',
                     paper_bgcolor='#323130', font=dict(color="white"))
     return fig
