@@ -1,6 +1,5 @@
 import importlib
 from fire import Fire
-from corona_dashboard.forecast import Hyperparameters
 
 class Controller:
     def up(self, debug=False):
@@ -19,7 +18,6 @@ class Controller:
         
         if hp:
             print(f"Hyperparameters: {hp}")
-            hp = Hyperparameters.from_dict(hp)
             process_data(hp=hp)
         else:
             process_data()

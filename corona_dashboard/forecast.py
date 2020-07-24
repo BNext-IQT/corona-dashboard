@@ -20,24 +20,18 @@ COUNTRIES_URL = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/
 FIPS_PATH = Path('data', 'us-fips.json')
 FORECAST_PATH = Path('data', 'forecast.pickle')
 
-
-class Hyperparameters:
-    information_criterion = 'bic'
-    method = 'nm'
-    scoring = 'mae'
-    maxiter = 170
-    start_p = 3
-    max_p = 18
-    start_q = 3
-    max_q = 14
-    max_d = 18
-
-    @staticmethod
-    def from_dict(values):
-        hp = Hyperparameters()
-        hp.__dict__.update(values)
-        return hp
-
+HYPERPARAMETERS = {
+    'horizon': 7,
+    'information_criterion': 'bic',
+    'method': 'nm',
+    'scoring': 'mae',
+    'maxiter': 170,
+    'start_p': 3,
+    'max_p': 18,
+    'start_q': 3,
+    'max_q': 14,
+    'max_d': 18
+}
 
 def get_fips_data() -> dict:
     if not FIPS_PATH.exists():
@@ -57,10 +51,10 @@ def get_counties_data() -> pd.DataFrame:
     
     return us_counties
 
-def forecast(us_counties: pd.DataFrame, log_metrics, hp):
+def forecast(us_counties: pd.DataFrame, log_metrics: bool, hp: dict):
     metrics = {}
     growth_rates = {}
-    horizon = 7
+    horizon = hp['horizon']
 
     for location in tqdm(
             us_counties['location'].unique(),
@@ -69,7 +63,7 @@ def forecast(us_counties: pd.DataFrame, log_metrics, hp):
             'cases']
         if len(y) < horizon:
             continue
-        model = AutoARIMA(**hp.__dict__)
+        model = AutoARIMA(**hp)
         with warnings.catch_warnings():
             # When there is no cases, it will throw a warning
             warnings.filterwarnings("ignore")
@@ -109,7 +103,7 @@ def forecast(us_counties: pd.DataFrame, log_metrics, hp):
     return us_counties, final_list, metrics
 
 
-def process_data(log_metrics=True, hp=Hyperparameters()) -> (pd.DataFrame, dict, Sequence):
+def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame, dict, Sequence):
     Path('data').mkdir(exist_ok=True)
 
     fips_metadata = get_fips_data()

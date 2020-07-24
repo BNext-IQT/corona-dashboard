@@ -1,6 +1,6 @@
 from sigopt import Connection
 from sigopt.exception import ApiException
-from corona_dashboard.forecast import forecast, get_counties_data, Hyperparameters
+from corona_dashboard.forecast import forecast, get_counties_data
 
 def create_experiment(apikey):
     conn = Connection(client_token=apikey)
@@ -129,8 +129,8 @@ def continue_experiment(apikey, exp_id):
         except ApiException:
             conn.experiments(exp_id).suggestions().delete()
             suggestion = conn.experiments(exp_id).suggestions().create()
-        assignments = Hyperparameters.from_dict(suggestion.assignments)
-        print(f"Hyperpameters: {assignments.__dict__}")
+        assignments = suggestion.assignments
+        print(f"Hyperpameters: {assignments}")
         try:
             _, _, metrics = forecast(us_counties, log_metrics=True, hp=assignments)
             mean = sum(metrics.values()) / len(metrics)
