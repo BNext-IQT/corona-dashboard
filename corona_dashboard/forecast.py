@@ -17,6 +17,7 @@ OUTBREAK_LABELS = {1: 'Low', 2: 'Medium-Low', 3: 'Medium',
 
 FIPS_URL = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
 COUNTRIES_URL = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
+USA_URL = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv'
 FIPS_PATH = Path('data', 'us-fips.json')
 FORECAST_PATH = Path('data', 'forecast.pickle')
 
@@ -51,13 +52,17 @@ def get_counties_data() -> pd.DataFrame:
     
     return us_counties
 
+def get_us_data() -> (int, int):
+    last_row = pd.read_csv(USA_URL).iloc[-1]
+    return last_row['cases'], last_row['deaths']
+
 def forecast(us_counties: pd.DataFrame, log_metrics: bool, hp: dict):
     metrics = {}
     growth_rates = {}
     horizon = hp['horizon']
 
     for location in tqdm(
-            us_counties['location'].unique(),
+            us_counties['location'].unique()[:180],
             unit=' counties'):
         y = us_counties[us_counties.location == location].reset_index()[
             'cases']
@@ -103,7 +108,7 @@ def forecast(us_counties: pd.DataFrame, log_metrics: bool, hp: dict):
     return us_counties, final_list, metrics
 
 
-def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame, dict, Sequence):
+def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame, dict, Sequence, dict, int, int):
     Path('data').mkdir(exist_ok=True)
 
     fips_metadata = get_fips_data()
@@ -115,10 +120,11 @@ def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame,
 
     if counties_is_fresh and FORECAST_PATH.exists():
         with open(FORECAST_PATH, 'rb') as fd:
-            us_counties, final_list, metrics = pickle.load(fd)
+            us_counties, final_list, metrics, us_cases, us_deaths = pickle.load(fd)
     else:
-        print('US Counties data missing or stale. Downloading fresh data...')
+        print('Forecast missing or stale. Downloading fresh data...')
         us_counties = get_counties_data()
+        us_cases, us_deaths = get_us_data()
         if log_metrics:
             print('Forecasting...')
             us_counties, final_list, _ = forecast(us_counties, log_metrics, hp)
@@ -128,6 +134,6 @@ def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame,
             print('Forecasting...')
             us_counties, final_list, metrics = forecast(us_counties, log_metrics, hp)
         with open(FORECAST_PATH, 'wb') as fd:
-            pickle.dump((us_counties, final_list, metrics), fd)
+            pickle.dump((us_counties, final_list, metrics, us_cases, us_deaths), fd)
 
-    return us_counties, fips_metadata, final_list[:12], metrics
+    return us_counties, fips_metadata, final_list[:8], metrics, us_cases, us_deaths

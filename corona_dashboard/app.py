@@ -14,7 +14,8 @@ APP = dash.Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=devi
 APP.title = 'Coronavirus Dashboard'
 SERVER = APP.server
 
-US_COUNTIES, FIPS_METADATA, WORST_COUNTIES, METRICS = process_data()
+US_COUNTIES, FIPS_METADATA, WORST_COUNTIES, METRICS, US_CASES, US_DEATHS = process_data()
+
 if len(METRICS) == 0:
     METRICS = "Not Measured"
 else:
@@ -51,6 +52,10 @@ APP.layout = html.Div(
                                 ),
                                 html.P("Our artificial intelligence model learns from growth trends to predict next week's outbreak risk on a per-county basis. These results are experimental."),
                                 html.Br(),
+                                html.B("Total Cases:"),
+                                html.P(f"{US_CASES:,d}"),
+                                html.B("Total Deaths:"),
+                                html.P(f"{US_DEATHS:,d}"),
                                 html.B("Forecast Generated:"),
                                 html.P(FORECAST_TIMESTAMP),
                                 html.B("Predictive Error (SMAPE):"),
