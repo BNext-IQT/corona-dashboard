@@ -106,8 +106,7 @@ def create_experiment(apikey):
         ],
         metrics=[dict(
             name="SMAPE",
-            objective="minimize",
-            threshold=None
+            objective="minimize"
         )],
         metadata=dict(
             template="dashboard"
