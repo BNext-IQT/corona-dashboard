@@ -1,6 +1,6 @@
 from sigopt import Connection
 from sigopt.exception import ApiException
-from corona_dashboard.forecast import forecast, get_counties_data
+from corona_dashboard.forecast import forecast, get_counties_data, HYPERPARAMETERS
 
 def create_experiment(apikey):
     conn = Connection(client_token=apikey)
@@ -8,50 +8,34 @@ def create_experiment(apikey):
         name="Coronaboard -- AutoARIMA",
         parameters=[
             dict(
-                name="start_p",
-                bounds=dict(
-                    min=2,
-                    max=3
-                ),
-                type="int"
-            ),
-            dict(
                 name="max_p",
                 bounds=dict(
-                    min=3,
-                    max=20
-                ),
-                type="int"
-            ),
-            dict(
-                name="start_q",
-                bounds=dict(
-                    min=2,
-                    max=3
+                    min=14,
+                    max=30
                 ),
                 type="int"
             ),
             dict(
                 name="max_q",
                 bounds=dict(
-                    min=3,
-                    max=20
+                    min=14,
+                    max=30
                 ),
                 type="int"
             ),
             dict(
                 name="max_d",
                 bounds=dict(
-                    min=2,
-                    max=20
+                    min=14,
+                    max=30
                 ),
                 type="int"
             ),
             dict(
                 name="maxiter",
                 bounds=dict(
-                    min=20,
-                    max=200
+                    min=140,
+                    max=360
                 ),
                 type="int"
             ),
@@ -111,8 +95,8 @@ def create_experiment(apikey):
         metadata=dict(
             template="dashboard"
         ),
-        observation_budget=300,
-        parallel_bandwidth=10,
+        observation_budget=400,
+        parallel_bandwidth=12,
         project="dashboard-dev"
         
     )
@@ -131,9 +115,10 @@ def continue_experiment(apikey, exp_id):
         assignments = suggestion.assignments
         print(f"Hyperpameters: {assignments}")
         try:
-            _, _, metrics = forecast(us_counties, log_metrics=True, hp=assignments)
+            _, _, metrics = forecast(us_counties, log_metrics=True, hp={**HYPERPARAMETERS, **assignments})
             mean = sum(metrics.values()) / len(metrics)
         except:
+            print("Invalid hyperparameter combination!")
             mean = 0.9999
         finally:
             conn.experiments(exp_id).observations().create(
