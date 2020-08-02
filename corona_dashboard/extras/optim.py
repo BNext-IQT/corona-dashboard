@@ -34,28 +34,10 @@ def create_experiment(apikey):
             dict(
                 name="maxiter",
                 bounds=dict(
-                    min=140,
+                    min=80,
                     max=360
                 ),
                 type="int"
-            ),
-            dict(
-                name="method",
-                categorical_values=[
-                    dict(
-                        name="nm"
-                    ),
-                    dict(
-                        name="bfgs"
-                    ),
-                    dict(
-                        name="lbfgs"
-                    ),
-                    dict(
-                        name="powell"
-                    )
-                ],
-                type="categorical"
             ),
             dict(
                 name="scoring",
@@ -103,7 +85,8 @@ def create_experiment(apikey):
     return experiment.id
 
 def continue_experiment(apikey, exp_id):
-    us_counties = get_counties_data()
+    counties_url = 'https://github.com/nytimes/covid-19-data/raw/42378bc95a04ff4fe798d2378affb351954db164/us-counties.csv'
+    us_counties = get_counties_data(counties_url)
     conn = Connection(client_token=apikey)
     experiment = conn.experiments(exp_id).fetch()
     for _ in range(experiment.observation_budget):
@@ -117,8 +100,9 @@ def continue_experiment(apikey, exp_id):
         try:
             _, _, metrics = forecast(us_counties, log_metrics=True, hp={**HYPERPARAMETERS, **assignments})
             mean = sum(metrics.values()) / len(metrics)
-        except:
+        except Exception as e:
             print("Invalid hyperparameter combination!")
+            print(str(e))
             mean = 0.9999
         finally:
             conn.experiments(exp_id).observations().create(
