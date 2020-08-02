@@ -12,9 +12,6 @@ from pmdarima.arima import AutoARIMA
 from pmdarima.model_selection import train_test_split
 
 
-OUTBREAK_LABELS = {1: 'Low', 2: 'Medium-Low', 3: 'Medium',
-                   4: 'Medium-High', 5: 'High', 6: 'Very High'}
-
 FIPS_URL = 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json'
 COUNTRIES_URL = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv'
 USA_URL = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv'
