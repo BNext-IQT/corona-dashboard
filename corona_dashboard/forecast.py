@@ -62,7 +62,7 @@ def forecast(us_counties: pd.DataFrame, log_metrics: bool, hp: dict):
     horizon = hp['horizon']
 
     for location in tqdm(
-            us_counties['location'].unique()[:180],
+            us_counties['location'].unique(),
             unit=' counties'):
         y = us_counties[us_counties.location == location].reset_index()[
             'cases']
