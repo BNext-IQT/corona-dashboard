@@ -136,4 +136,4 @@ def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame,
         with open(FORECAST_PATH, 'wb') as fd:
             pickle.dump((us_counties, final_list, metrics, us_cases, us_deaths), fd)
 
-    return us_counties, fips_metadata, final_list[:8], metrics, us_cases, us_deaths
+    return us_counties, fips_metadata, final_list[:10], metrics, us_cases, us_deaths
