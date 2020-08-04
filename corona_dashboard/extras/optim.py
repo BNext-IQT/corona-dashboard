@@ -84,6 +84,10 @@ def create_experiment(apikey):
     )
     return experiment.id
 
+def clean_experiment(apikey, exp_id):
+    conn = Connection(client_token=apikey)
+    conn.experiments(exp_id).suggestions().delete()
+
 def continue_experiment(apikey, exp_id):
     counties_url = 'https://github.com/nytimes/covid-19-data/raw/42378bc95a04ff4fe798d2378affb351954db164/us-counties.csv'
     us_counties = get_counties_data(counties_url)

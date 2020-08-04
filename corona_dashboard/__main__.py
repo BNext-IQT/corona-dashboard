@@ -39,5 +39,13 @@ class Controller:
 
             continue_experiment(apikey, exp_id)
 
+        def clean_experiment(self, apikey, exp_id):
+            """
+            Remove any dangling state from a SigOpt experiment.
+            """
+            from corona_dashboard.extras.optim import clean_experiment
+
+            clean_experiment(apikey, exp_id)
+
 def main():
     Fire(Controller)
