@@ -41,12 +41,14 @@ def get_fips_data() -> dict:
     
     return fips_metadata
 
-def get_counties_data() -> pd.DataFrame:
-    us_counties = pd.read_csv(COUNTRIES_URL, dtype={"fips": str})
+def get_counties_data(url: str = None) -> pd.DataFrame:
+    if not url:
+        url = COUNTRIES_URL
+    us_counties = pd.read_csv(url, dtype={"fips": str})
     us_counties = us_counties[us_counties.county != 'Unknown']
     us_counties['location'] = us_counties[[
         'county', 'state']].apply(', '.join, axis=1)
-    
+
     return us_counties
 
 def get_us_data() -> (int, int):
