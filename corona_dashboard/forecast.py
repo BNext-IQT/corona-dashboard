@@ -20,14 +20,14 @@ FORECAST_PATH = Path('data', 'forecast.pickle')
 
 HYPERPARAMETERS = {
     'horizon': 7,
-    'information_criterion': 'bic',
+    'information_criterion': 'hqic',
     'method': 'nm',
     'scoring': 'mae',
-    'maxiter': 170,
+    'maxiter': 180,
     'start_p': 3,
-    'max_p': 18,
+    'max_p': 30,
     'start_q': 3,
-    'max_q': 14,
+    'max_q': 18,
     'max_d': 18
 }
 
