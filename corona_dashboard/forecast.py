@@ -55,14 +55,21 @@ def get_us_data() -> (int, int):
     last_row = pd.read_csv(USA_URL).iloc[-1]
     return last_row['cases'], last_row['deaths']
 
-def forecast(us_counties: pd.DataFrame, log_metrics: bool, hp: dict):
+def forecast(us_counties: pd.DataFrame, log_metrics: bool, hp: dict, metric_threshold: int = 5):
     metrics = {}
     growth_rates = {}
     horizon = hp['horizon']
+    metric_skip = 0
 
     for location in tqdm(
             us_counties['location'].unique(),
             unit=' counties'):
+        if log_metrics:
+            if metric_skip == metric_threshold:
+                metric_skip = 0
+            else: 
+                metric_skip += 1
+                continue
         y = us_counties[us_counties.location == location].reset_index()[
             'cases']
         if len(y) < horizon:
@@ -102,10 +109,10 @@ def forecast(us_counties: pd.DataFrame, log_metrics: bool, hp: dict):
             return 1
         return round(max(0, (case_growth - 1) * 100))
 
-    us_counties['outbreak_risk'] = us_counties.apply(rank_risk, axis=1)
+    if not log_metrics:
+        us_counties['outbreak_risk'] = us_counties.apply(rank_risk, axis=1)
 
     return us_counties, final_list, metrics
-
 
 def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame, dict, Sequence, dict, int, int):
     Path('data').mkdir(exist_ok=True)
@@ -126,7 +133,7 @@ def process_data(log_metrics=True, hp: dict = HYPERPARAMETERS) -> (pd.DataFrame,
         us_cases, us_deaths = get_us_data()
         if log_metrics:
             print('Forecasting...')
-            us_counties, final_list, _ = forecast(us_counties, log_metrics, hp)
+            us_counties, final_list, _ = forecast(us_counties, False, hp)
             print('Measuring accuracy of forecast...')
             _, _, metrics = forecast(us_counties, log_metrics, hp)
         else:
