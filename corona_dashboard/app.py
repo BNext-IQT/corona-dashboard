@@ -27,7 +27,7 @@ FORECAST_TIMESTAMP = datetime.fromtimestamp(FORECAST_PATH.stat().st_ctime).strft
 
 _MAP = px.choropleth_mapbox(
         US_COUNTIES, geojson=FIPS_METADATA, locations='fips', color='outbreak_risk',
-        color_continuous_scale='orrd', range_color=(0, 50),
+        color_continuous_scale='orrd', range_color=(0, 40),
         hover_name='location',
         hover_data=['outbreak_risk'],
         mapbox_style='carto-darkmatter', zoom=3.2, opacity=0.5,
