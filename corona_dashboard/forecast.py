@@ -47,7 +47,7 @@ def get_counties_data(url: str = None) -> pd.DataFrame:
     us_counties = pd.read_csv(url, dtype={"fips": str})
     us_counties = us_counties[us_counties.county != 'Unknown']
     us_counties['location'] = us_counties[[
-        'county', 'state']].apply(', '.join, axis=1)
+        'county', 'state']].apply(lambda x: ', '.join((x[0].replace('.', '') , x[1])), axis=1)
 
     return us_counties
 
