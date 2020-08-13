@@ -1,6 +1,7 @@
 """
 The WSGI (web app) entry point.
 """
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence, Generator
@@ -37,8 +38,8 @@ _MAP = px.choropleth_mapbox(
 _MAP.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False,
                    font=dict(color="white"))
 
-if (Path(APP.config.assets_folder) / "brand.png").exists():
-    _LOGO = APP.get_asset_url("brand.png")
+if os.environ.get('DASHBOARD_BRAND'):
+    _LOGO = os.environ['DASHBOARD_BRAND']
 else:
     _LOGO = APP.get_asset_url("logo.png")
 
