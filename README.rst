@@ -29,6 +29,9 @@ Usage
 
     corona-dashboard up
 
+Running the web app on a WSGI server is recommended for production. The module is 
+"corona_dashboard.app:SERVER". We use uWSGI.
+
 License and Acknowledgment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
